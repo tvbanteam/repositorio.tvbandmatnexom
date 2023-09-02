@@ -22,7 +22,7 @@
         <description>Repositorio de addons para [COLOR azure]TVBAN[/COLOR].
 [B][COLOR lime]CREDITOS:
 [COLOR white]• Developers:[/COLOR][/B] [COLOR gold]JoseaTeba[/COLOR]</description> 		             
-        <disclaimer>[COLOR cyan]Éste repositorio sólo recoge Add-ons externos válidos para [COLOR azure]KODI 20 [COLOR blueviolet]NEXUS KODI 20 [COLOR dodgerblue]OMEGA [/COLOR]</disclaimer>
+        <disclaimer>[COLOR cyan]Éste repositorio sólo recoge Add-ons externos válidos para [COLOR azure]KODI 20 [COLOR blueviolet]NEXUS, KODI 21 [COLOR dodgerblue]OMEGA [/COLOR]</disclaimer>
         <platform>all</platform>
         <assets>
             <icon>icon.png</icon>
