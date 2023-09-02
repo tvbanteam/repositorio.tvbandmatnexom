@@ -97,6 +97,54 @@
     </extension>
 </addon>
 
+<addon id="skin.auramod.andTVBAN" version="1.1.9" name="[COLOR azure]Aura[/COLOR][COLOR darkviolet]TVBAN[/COLOR]" provider-name="[COLOR darkviolet]andTVban,JoseAnd[/COLOR],auraMod">
+    <requires>
+        <import addon="xbmc.gui" version="5.15.0"/>
+        <import addon="script.skin.helper.service" version="1.1.24"/>
+        <import addon="script.skin.helper.widgets" version="1.0.0"/>
+        <import addon="script.skinshortcuts" version="2.0.3"/>
+        <import addon="script.image.resource.select" version="0.0.5"/>
+		<import addon="service.library.data.provider" version="0.0.7"/>
+        <import addon="plugin.program.autocompletion" version="1.0.1"/>
+        <import addon="resource.images.studios.white" version="0.0.30"/>
+        <import addon="resource.images.studios.coloured" version="0.0.18"/>
+        <import addon="resource.images.moviegenreicons.transparent" version="0.0.6"/>
+		<import addon="script.colorbox" version="2.0.8"/>
+    </requires>
+    <extension point="xbmc.gui.skin" defaultthemename="Textures.xbt" debugging="false" effectslowdown="1">
+        <res width="1920" height="1080" aspect="16:9" default="true" folder="1080i"/>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es">[COLOR azure]Mod[/COLOR] [COLOR darkviolet]TVBAN[/COLOR] [COLOR azure]de Auramod para Kodi 20 / Nexus Minimalista, Personalizable, Multiple Widgets.[/COLOR] </summary>
+        <description lang="es">Mod [COLOR darkviolet]TVBAN[/COLOR] de AuraMod. Esta versión de Aura está basada para todos los usuarios. Editado por José Andrés</description>
+		<news>[COLOR tan]Nuevos cambios:[/COLOR]
+		    - Skin modificada para Kodi 20 Nexus y [COLOR darkviolet]TVBAN[/COLOR]
+			v1.1.9
+            -Fix Aura Home horizontal menu layout
+            -Fix conditional spacers when horizontal menu enabled
+            -Add conditional spacer when category widget disabled
+            v1.1.8
+            -Fix weather widget visibility
+            -Fix skin settings labels
+            -Fix skin settings comment blocks
+            v1.1.7
+            -Fix empty enabled widgets visibility
+            -Fix default widget paths
+		</news>
+        <platform>all</platform>
+        <license>Creative Commons Attribution Non-Commercial Share-Alike 4.0</license>
+        <assets>
+            <icon>icon.png</icon>
+            <fanart>fanart.jpg</fanart>
+            <screenshot>resources/screenshot-01.jpg</screenshot>
+            <screenshot>resources/screenshot-02.jpg</screenshot>
+            <screenshot>resources/screenshot-03.jpg</screenshot>
+            <screenshot>resources/screenshot-04.jpg</screenshot>
+            <screenshot>resources/screenshot-05.jpg</screenshot>
+        </assets>
+    </extension>
+</addon>
+
 <addon id="plugin.program.andtvban" name="[B][COLOR azure]TVBAN[/COLOR][COLOR darkviolet]NEXUS[/COLOR][/B]" version="8.8.23" provider-name="[B][COLOR azure]andTVban, JoseAnd[/COLOR][/B]">
     <requires>
         <import addon="xbmc.python" version="3.0.0" />
@@ -118,7 +166,7 @@
     	<description lang="en">
 [COLOR lime][B]CREDITOS:[/COLOR][/B]
 [COLOR white][B]• Developers:[/B]      [COLOR darkorange]JoseAnd[/COLOR]
-[COLOR white][B]• Testers:[/B]             [COLOR darkorange]JoseAnd, [COLOR tan]AndTVban[/COLOR]
+[COLOR white][B]• Testers:[/B]            [COLOR darkorange]JoseAnd, [COLOR tan]AndTVban[/COLOR]
 [COLOR white][B]• Telegram:[/B]         [COLOR dodgerblue]t.me/+andTvban[/COLOR]</description>
         <disclaimer>[COLOR tan][B]Está Prohibida su distribución, cedido por su autor, editado por AndTVban y Protegidos por los Derechos del Autor y Editor.[/B][/COLOR]</disclaimer>
 		<platform>all</platform>
@@ -1129,8 +1177,8 @@ No se acepta ninguna responsabilidad por el uso de este addon.
     </extension>
 </addon>
 
-<addon id="repository.andTVban" name="[COLOR steelblue][B]Repo[/COLOR] [COLOR azure]andTV[COLOR blueviolet]ban[/B][/COLOR]" version="30.8.23" provider-name="andTVban, JoseaTeba">
-    <extension point="xbmc.addon.repository" name="[COLOR dodgerblue][B]Repo[/B][/COLOR] [COLOR azure]ANDTV [COLOR blueviolet]NEXUS[/B][/COLOR]">
+<addon id="repository.andTVban" name="[COLOR steelblue][B]Repo[/COLOR] [COLOR green]and[COLOR azure]TV[COLOR blueviolet]ban[/B][/COLOR]" version="02.9.23" provider-name="andTVban, JoseaTeba">
+    <extension point="xbmc.addon.repository" name="[COLOR steelblue][B]Repo[/COLOR] [COLOR green]and[COLOR azure]TV[COLOR blueviolet]ban[/B][/COLOR]">
 		<dir minversion="20.0" maxversion="20.9.0">
             <info compressed="false">https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/nexus/zips/addons.xml</info>
             <checksum>https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/nexus/zips/addons.xml.md5</checksum>
@@ -1142,17 +1190,17 @@ No se acepta ninguna responsabilidad por el uso de este addon.
             <datadir zip="true">https://raw.githubusercontent.com/Palantiraddon/repo/master/Palantir/</datadir>
         </dir>
         <dir minversion="21.9.0" maxversion="21.9.0">
-            <info compressed="false">https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/nexus/zips/addons.xml</info>
-            <checksum>https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/nexus/zips/addons.xml.md5</checksum>
-            <datadir zip="true">https://raw.githubusercontent.com/andtvban/repositorio.andtvban/master/nexus/zips</datadir>
+            <info compressed="false">https://raw.githubusercontent.com/tvbandteam/repositorio.tvbandteam/master/omega/zips/addons.xml</info>
+            <checksum>https://raw.githubusercontent.com/tvbandteam/repositorio.tvbandteam/master/omega/zips/addons.xml.md5</checksum>
+            <datadir zip="true">https://raw.githubusercontent.com/tvbandteam/repositorio.tvbandteam/master/omega/zips</datadir>
         </dir>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary>[COLOR steelblue]Repo[/COLOR] [COLOR azure]Andtv[/COLOR] [COLOR blueviolet]Nexus[/COLOR]</summary>
+        <summary>[COLOR steelblue]Repo[/COLOR] [COLOR green]and[COLOR azure]TV[/COLOR] [COLOR blueviolet]ban[/COLOR]</summary>
         <description>Repositorio de addons para [COLOR azure]TVBAN[/COLOR].
 [B][COLOR lime]CREDITOS:
 [COLOR white]• Developers:[/COLOR][/B] [COLOR gold]JoseaTeba[/COLOR]</description>
-        <disclaimer>[COLOR cyan]Éste repositorio sólo recoge Add-ons externos válidos para [COLOR azure]KODI 20 [COLOR blueviolet]NEXUS.[/COLOR]</disclaimer>
+        <disclaimer>[COLOR cyan]Éste repositorio sólo recoge Add-ons externos válidos para [COLOR azure]KODI 20 [COLOR blueviolet]NEXUS KODI 20 [COLOR dodgerblue]OMEGA [/COLOR]</disclaimer>
         <platform>all</platform>
         <assets>
             <icon>icon.png</icon>
@@ -1659,53 +1707,5 @@ Kodi is a registered trademark of the XBMC Foundation. We are not connected to o
 			<fanart>resources/fanart.jpg</fanart>
 		</assets>
 	</extension>
-</addon>
-
-<addon id="skin.auramod.andTVBAN" version="1.1.9" name="[COLOR azure]Aura[/COLOR][COLOR darkviolet]TVBAN[/COLOR]" provider-name="[COLOR darkviolet]andTVban,JoseAnd[/COLOR],auraMod">
-    <requires>
-        <import addon="xbmc.gui" version="5.15.0"/>
-        <import addon="script.skin.helper.service" version="1.1.24"/>
-        <import addon="script.skin.helper.widgets" version="1.0.0"/>
-        <import addon="script.skinshortcuts" version="2.0.3"/>
-        <import addon="script.image.resource.select" version="0.0.5"/>
-		<import addon="service.library.data.provider" version="0.0.7"/>
-        <import addon="plugin.program.autocompletion" version="1.0.1"/>
-        <import addon="resource.images.studios.white" version="0.0.30"/>
-        <import addon="resource.images.studios.coloured" version="0.0.18"/>
-        <import addon="resource.images.moviegenreicons.transparent" version="0.0.6"/>
-		<import addon="script.colorbox" version="2.0.8"/>
-    </requires>
-    <extension point="xbmc.gui.skin" defaultthemename="Textures.xbt" debugging="false" effectslowdown="1">
-        <res width="1920" height="1080" aspect="16:9" default="true" folder="1080i"/>
-    </extension>
-    <extension point="xbmc.addon.metadata">
-        <summary lang="es">[COLOR azure]Mod[/COLOR] [COLOR darkviolet]TVBAN[/COLOR] [COLOR azure]de Auramod para Kodi 20 / Nexus Minimalista, Personalizable, Multiple Widgets.[/COLOR] </summary>
-        <description lang="es">Mod [COLOR darkviolet]TVBAN[/COLOR] de AuraMod. Esta versión de Aura está basada para todos los usuarios. Editado por José Andrés</description>
-		<news>[COLOR tan]Nuevos cambios:[/COLOR]
-		    - Skin modificada para Kodi 20 Nexus y [COLOR darkviolet]TVBAN[/COLOR]
-			v1.1.9
-            -Fix Aura Home horizontal menu layout
-            -Fix conditional spacers when horizontal menu enabled
-            -Add conditional spacer when category widget disabled
-            v1.1.8
-            -Fix weather widget visibility
-            -Fix skin settings labels
-            -Fix skin settings comment blocks
-            v1.1.7
-            -Fix empty enabled widgets visibility
-            -Fix default widget paths
-		</news>
-        <platform>all</platform>
-        <license>Creative Commons Attribution Non-Commercial Share-Alike 4.0</license>
-        <assets>
-            <icon>icon.png</icon>
-            <fanart>fanart.jpg</fanart>
-            <screenshot>resources/screenshot-01.jpg</screenshot>
-            <screenshot>resources/screenshot-02.jpg</screenshot>
-            <screenshot>resources/screenshot-03.jpg</screenshot>
-            <screenshot>resources/screenshot-04.jpg</screenshot>
-            <screenshot>resources/screenshot-05.jpg</screenshot>
-        </assets>
-    </extension>
 </addon>
 </addons>
