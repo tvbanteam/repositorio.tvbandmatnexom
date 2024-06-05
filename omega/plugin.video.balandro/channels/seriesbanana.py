@@ -5,10 +5,16 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://seriesbanana.com/'
+host = 'https://www3.seriesbanana.com/'
 
 
 def do_downloadpage(url, post=None, headers=None):
+    # ~ por si viene de enlaces guardados
+    ant_hosts = ['https://seriesbanana.com/']
+
+    for ant in ant_hosts:
+        url = url.replace(ant, host)
+
     headers = {'Referer': host}
 
     data = httptools.downloadpage(url, post=post, headers=headers).data
@@ -92,7 +98,9 @@ def temporadas(item):
         title = 'Temporada ' + season
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.url = url
             item.contentType = 'season'
@@ -128,7 +136,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('SeriesBanana', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -222,7 +231,7 @@ def findvideos(item):
         url = scrapertools.find_single_match(data, '<iframe.*?src="(.*?)"')
 
         if url:
-           other = scrapertools.find_single_match(option, '<p class="AAIco-dns">(.*?)</p>')
+           other = scrapertools.find_single_match(option, '<p class="AAIco-dns">(.*?)</p>').strip()
 
            url = url.replace('&#038;', '&').replace('&amp;', '&')
 

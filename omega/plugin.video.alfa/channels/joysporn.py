@@ -7,34 +7,28 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; _dict = dict
 
-import re
-import traceback
-if not PY3: _dict = dict; from collections import OrderedDict as dict
+from lib import AlfaChannelHelper
+if not PY3: _dict = dict; from AlfaChannelHelper import dict
+from AlfaChannelHelper import DictionaryAdultChannel
+from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
 
-from core.item import Item
-from core import servertools
-from core import scrapertools
-from core import jsontools
-from channelselector import get_thumb
-from platformcode import config, logger
-from channels import filtertools, autoplay
-from lib.AlfaChannelHelper import DictionaryAdultChannel
-
-IDIOMAS = {}
+IDIOMAS = AlfaChannelHelper.IDIOMAS_A
 list_language = list(set(IDIOMAS.values()))
-list_quality = []
-list_quality_movies = []
+list_quality_movies = AlfaChannelHelper.LIST_QUALITY_MOVIES_A
 list_quality_tvshow = []
-list_servers = []
+list_quality = list_quality_movies + list_quality_tvshow
+list_servers = AlfaChannelHelper.LIST_SERVERS_A
 forced_proxy_opt = 'ProxySSL'
 
-# https://tubxporn.xxx  https://pornky.com  https://pornktube.tv  https://joysporn.com
+# https://tubxporn.xxx  https://pornky.com  https://pornktube.tv  https://wwv.joysporn.sex/
+# https://www.pornky.club/ https://www.pornktube.club/  https://tubxporn.club/ https://joysporn.club/
 
 canonical = {
              'channel': 'joysporn', 
              'host': config.get_setting("current_host", 'joysporn', default=''), 
-             'host_alt': ["https://wwv.joysporn.sex/"], 
-             'host_black_list': [], 
+             'host_alt': ["https://joysporn.club/"], 
+             'host_black_list': ["https://wwv.joysporn.sex/", "https://joysporn.com/"], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
@@ -86,7 +80,7 @@ def mainlist(item):
     itemlist.append(Item(channel=item.channel, title="Nuevas" , action="list_all", url=host + "latest/page/1/"))
     itemlist.append(Item(channel=item.channel, title="Mas Vistas" , action="list_all", url=host + "apapu/page/1/"))
     itemlist.append(Item(channel=item.channel, title="Mejor valorada" , action="list_all", url=host + "viewsing/page/1/"))
-    itemlist.append(Item(channel=item.channel, title="Categorias" , action="section", url=host + "list.html", extra="Categorias"))
+    itemlist.append(Item(channel=item.channel, title="Categorias" , action="section", url=host + "ilisting.html", extra="Categorias"))
     itemlist.append(Item(channel=item.channel, title="Buscar", action="search"))
     return itemlist
 

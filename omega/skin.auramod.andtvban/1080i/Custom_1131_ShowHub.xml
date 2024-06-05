@@ -94,16 +94,16 @@
                             <label>Balandro</label>
 							<selected>System.HasAddon(plugin.video.balandro)</selected>
                             <onclick>InstallAddon(plugin.video.balandro)</onclick>	
-							<onfocus>SetProperty(Image_Preview,https://i.imgur.com/lpckOAp.png)</onfocus>
+							<onfocus>SetProperty(Image_Preview,https://i.imgur.com/IWhM2NM.png)</onfocus>
                         </control>
 						
-						<control type="radiobutton" id="9007" description="Palantir 2">
+						<control type="radiobutton" id="9007" description="Palantir">
                             <include>Dialog_Standard_ListButton</include>
                             <radioposx>630</radioposx>
-                            <label>Palantir 2</label>
-							<selected>System.HasAddon(plugin.video.palantir2)</selected>							
-                            <onclick>InstallAddon(plugin.video.palantir2)</onclick>	
-							<onfocus>SetProperty(Image_Preview,https://i.imgur.com/WlWLdLl.png)</onfocus>
+                            <label>Palantir</label>
+							<selected>System.HasAddon(plugin.video.palantir3)</selected>							
+                            <onclick>InstallAddon(plugin.video.palantir3)</onclick>	
+							<onfocus>SetProperty(Image_Preview,https://i.imgur.com/5Lrg43l.png)</onfocus>
                         </control> 
 						
 						-<control type="radiobutton" id="9008" description="Tacones">
@@ -115,10 +115,10 @@
 							<onfocus>SetProperty(Image_Preview,https://i.imgur.com/aciSu1i.png)</onfocus> 
                         </control>
 												
-						<control type="radiobutton" id="9009" description="CRISTAL AZUL 3.0.6">
+						<control type="radiobutton" id="9009" description="CRISTAL AZUL">
                             <include>Dialog_Standard_ListButton</include>
                             <radioposx>630</radioposx>
-                            <label>CRISTAL AZUL 3.0.6</label>
+                            <label>CRISTAL AZUL</label>
 							<selected>System.HasAddon(plugin.video.cristalazul)</selected>
                             <onclick>InstallAddon(plugin.video.cristalazul)</onclick>	
 							<onfocus>SetProperty(Image_Preview,https://i.imgur.com/8opYWgI.png)</onfocus>

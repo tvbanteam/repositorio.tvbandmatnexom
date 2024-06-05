@@ -4,12 +4,12 @@
     "ignore_urls": [],
     "patterns": [
       {
-        "pattern": "(http(?:s|)://dood(?:stream|).(?:watch|to|so|com|cx|la|ws|sh|pm|wf|re|yt)/(?:e|d)/[a-z0-9#]+)",
-        "url": "\\1"
+        "pattern": "http(?:s|)://dood(?:stream|s|).(?:watch|to|so|com|cx|la|ws|sh|pm|wf|re|yt|pro)/(?:e|d)/([a-z0-9#]+)",
+        "url": "https://d0000d.com/e/\\1"
       },
       {
-        "pattern": "(http(?:s|)://dooood.(?:watch|to|so|com|cx|la|ws|sh|pm|wf|re|yt)/(?:e|d)/[a-z0-9#]+)",
-        "url": "\\1"
+        "pattern": "http(?:s|)://(?:dooood|ds2play|d0o0d|do0od|d0000d|d000d|ds2video).(?:watch|to|so|com|cx|la|ws|sh|pm|wf|re|yt)/(?:e|d)/([a-z0-9#]+)",
+        "url": "https://d0000d.com/e/\\1"
       }
     ]
   },

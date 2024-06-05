@@ -23,14 +23,11 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return itemlist
+    if config.get_setting('descartar_xxx', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -59,7 +56,7 @@ def canales(item):
     for thumb, url, title in matches:
          url = host[:-1] + url
 
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, text_color = 'orange' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color = 'orange' ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="btn-pagination">Siguiente')
@@ -84,9 +81,11 @@ def categorias(item):
     matches = re.compile(patron, re.DOTALL).findall(data)
 
     for thumb, url, title in matches:
+         if title == 'Árabes': title = 'Arabes'
+
          url = host[:-1] + url
 
-         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, text_color='tan' ))
+         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='tan' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 
@@ -100,7 +99,7 @@ def pornstars(item):
 
     patron = '<div class="box-chica">.*?'
     patron += '<a href="([^"]+)".*?'
-    patron += 'src=\'([^\']+.jpg)\'.*?'
+    patron += 'data-src="(.*?)".*?'
     patron += '<h4><a href="[^"]+">([^<]+)</a></h4>.*?'
     patron += '<a class="total-videos".*?>([^<]+)</a>'
 
@@ -109,9 +108,9 @@ def pornstars(item):
     for url, thumb, title, videos in matches:
          url = host[:-1] + url
 
-         titulo = '[COLOR moccasin]%s[/COLOR] (%s)' % (title, videos)
+         titulo = '[COLOR moccasin]%s[/COLOR] (%s)' % (title, videos.replace('vídeos', '').strip())
 
-         itemlist.append(item.clone (action='list_all', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title ))
+         itemlist.append(item.clone (action='list_all', title=titulo, url=url, thumbnail=thumb ))
 
     if itemlist:
         next_page = scrapertools.find_single_match(data, '<a href="([^"]+)" class="btn-pagination">Siguiente')
@@ -166,6 +165,15 @@ def findvideos(item):
     data = re.sub(r"\n|\r|\t|&nbsp;|<br>|<br/>", "", data)
 
     url = scrapertools.find_single_match(data, "sendCdnInfo.'([^']+)")
+
+    if not url:
+        url = scrapertools.find_single_match(data, '<meta itemprop="embedURL".*?content="(.*?)"')
+
+        if url:
+            data = do_downloadpage(url)
+
+            url = scrapertools.find_single_match(data, '<source src="(.*?)"')
+
     url = url.replace("&amp;", "&")
 
     if url:

@@ -15,13 +15,16 @@ from core import tmdb
 from core.item import Item
 from platformcode import logger, config
 
+forced_proxy_opt = 'ProxySSL'
+
 canonical = {
              'channel': 'jkanime', 
              'host': config.get_setting("current_host", 'jkanime', default=''), 
              'host_alt': ["https://jkanime.net/"], 
              'host_black_list': [], 
              'pattern': '<meta\s*property="og:url"\s*content="([^"]+)"', 
-             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 
+             'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'forced_proxy_ifnot_assistant': forced_proxy_opt, 'cf_assistant': False, 
+             # 'set_tls': True, 'set_tls_min': False, 'retries_cloudflare': 1, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
 host = canonical['host'] or canonical['host_alt'][0]
@@ -247,7 +250,7 @@ def findvideos(item):
 #     return base64.b64encode(s.to_string().value)
     
 # def decode_url(data):
-#     from lib import js2py
+#     import js2py
 #     import re
 #     data = re.sub(r'\n|\r|\t|&nbsp;|<br>|\s{2,}', "", data)
 #     js = scrapertools.find_single_match(data, '<script>(l.*?)</script>')

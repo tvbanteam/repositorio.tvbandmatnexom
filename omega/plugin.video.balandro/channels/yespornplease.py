@@ -11,7 +11,19 @@ host = 'https://yespornpleasexxx.com/'
 
 
 def do_downloadpage(url, post=None, headers=None, raise_weberror=True):
-    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror).data
+    timeout = None
+    if host in url: timeout = config.get_setting('channels_repeat', default=30)
+
+    data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
+
+    if not data:
+        if url.startswith(host):
+            if not '?s=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('YesPornPlease', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                data = httptools.downloadpage(url, post=post, headers=headers, raise_weberror=raise_weberror, timeout=timeout).data
 
     return data
 
@@ -24,21 +36,18 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return itemlist
+    if config.get_setting('descartar_xxx', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host ))
 
     itemlist.append(item.clone( title = 'Por canal', action = 'canales', url = host ))
-    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'tags/' ))
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias', url = host + 'xnxx-tags/' ))
     itemlist.append(item.clone( title = 'Por estrella', action = 'pornstars', url = host + 'pornstars/' ))
 
     return itemlist
@@ -71,7 +80,9 @@ def categorias(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div class="box">.*?<a href="(.*?)".*?src="(.*?)".*?">(.*?)</a>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '>Categories<(.*?)Categories<p>')
+
+    matches = re.compile('<a href="(.*?)".*?src="(.*?)".*?<figcaption>(.*?)</figcaption>', re.DOTALL).findall(bloque)
 
     for url, thumb, title in matches:
         if title == 'All Videos': continue
@@ -87,14 +98,20 @@ def pornstars(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div class="box">.*?<a href="(.*?)".*?src="(.*?)".*?">(.*?)</a>', re.DOTALL).findall(data)
+    bloque = scrapertools.find_single_match(data, '>Pornstars</h1>(.*?)</main>')
 
-    for url, thumb, title in matches:
-        itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
+    matches = re.compile('<a(.*?)</a></div>', re.DOTALL).findall(bloque)
 
-    matches2 = re.compile('<figure class="gallery-item">.*?src="(.*?)".*?alt="(.*?)".*?<a href="(.*?)"', re.DOTALL).findall(data)
+    for match in matches:
+        url = scrapertools.find_single_match(match, 'href="(.*?)"')
 
-    for thumb, title, url in matches2:
+        title = scrapertools.find_single_match(match, '<figcaption>(.*?)</figcaption>')
+        if not title: title = scrapertools.find_single_match(match, 'class="wp-caption-text gallery-caption">(.*?)</a>')
+
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, 'data-src="(.*?)"')
+
         itemlist.append(item.clone (action='list_all', title=title, url=url, thumbnail=thumb, text_color='moccasin' ))
 
     return sorted(itemlist, key=lambda x: x.title)
@@ -106,12 +123,23 @@ def list_all(item):
 
     data = do_downloadpage(item.url)
 
-    matches = re.compile('<div class="post-preview-styling">.*?<a href="(.*?)".*?title="(.*?)".*?data-src="(.*?)"', re.DOTALL).findall(data)
+    matches = re.compile('<article(.*?)</article>', re.DOTALL).findall(data)
 
-    for url, title, thumb in matches:
+    for match in matches:
+        url = scrapertools.find_single_match(match, '<a href="(.*?)"')
+        title = scrapertools.find_single_match(match, 'title="(.*?)"')
+
+        if not url or not title: continue
+
+        thumb = scrapertools.find_single_match(match, 'src="(.*?)"')
+
+        time = scrapertools.find_single_match(match, '<p>(.*?)</p>')
+
         title = title.replace('&#8217;', '').replace('&#8211;', '&').replace('&#038;', '&')
 
-        itemlist.append(item.clone (action='findvideos', title=title, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
+        titulo = "[COLOR tan]%s[/COLOR] %s" % (time, title)
+
+        itemlist.append(item.clone (action='findvideos', title=titulo, url=url, thumbnail=thumb, contentType = 'movie', contentTitle = title, contentExtra='adults') )
 
     if itemlist:
         next_page = scrapertools.find_single_match(data,'<link rel="next" href="(.*?)"')
@@ -132,6 +160,8 @@ def findvideos(item):
     matches = re.compile('<iframe.*?-src="(.*?)"', re.DOTALL).findall(data)
 
     for link in matches:
+        if '//a.' in link: continue
+
         if host in link:
             data2 = do_downloadpage(link)
 
@@ -140,7 +170,15 @@ def findvideos(item):
             if url:
                 url += '|Referer=%s' % item.url
 
-                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'VO' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
+
+        if 'player-x.php?' in link:
+            url = scrapertools.find_single_match(data, 'mp4="(.*?)"')
+
+            if url:
+                url += '|Referer=%s' % item.url
+
+                itemlist.append(Item( channel = item.channel, action = 'play', server = 'directo', title = '', url = url, language = 'Vo' ))
 
         servidor = servertools.get_server_from_url(link)
         servidor = servertools.corregir_servidor(servidor)
@@ -150,7 +188,7 @@ def findvideos(item):
         if not 'http' in link: link = 'https:' + link
 
         if not servidor == 'directo':
-            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'VO' ))
+            itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, title = '', url = link, language = 'Vo' ))
 
     return itemlist
 

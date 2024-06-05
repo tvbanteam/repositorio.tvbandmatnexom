@@ -13,7 +13,7 @@ else:
 
 import re
 
-from platformcode import config, logger
+from platformcode import config, logger, platformtools
 from core.item import Item
 from core import httptools, scrapertools
 
@@ -23,6 +23,12 @@ host = 'https://motherless.com/'
 
 def do_downloadpage(url, post=None, headers=None):
     data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    if '<title>Just a moment...</title>' in data:
+        if not '/search/' in url:
+            platformtools.dialog_notification(config.__addon_name, '[COLOR red][B]CloudFlare[COLOR orangered] Protection[/B][/COLOR]')
+        return ''
+
     return data
 
 
@@ -34,14 +40,11 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    if descartar_xxx: return itemlist
+    if config.get_setting('descartar_xxx', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color = 'orange' ))
 
@@ -74,7 +77,7 @@ def categorias(item):
         title = title.strip()
         url = urlparse.urljoin(item.url, url)
 
-        itemlist.append(item.clone (action='list_all', title=title, url=url, contentType = 'movie', text_color = 'orange' ))
+        itemlist.append(item.clone (action='list_all', title=title, url=url, text_color = 'tan' ))
 
     return sorted(itemlist,key=lambda x: x.title)
 

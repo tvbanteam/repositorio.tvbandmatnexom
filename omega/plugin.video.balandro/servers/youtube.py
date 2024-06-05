@@ -18,6 +18,7 @@ import xbmc, re
 
 from platformcode import config, logger, platformtools
 from core import httptools, scrapertools, servertools
+
 from core import jsontools as json
 
 
@@ -29,16 +30,20 @@ web_yt = 'https://www.youtube.com'
 def get_video_url(page_url, url_referer=''):
     logger.info("(page_url='%s')" % page_url)
 
+    headers = {}
+
+    headers['Cookie'] = 'domain=.youtube.com; name=c_locale; value=0; expires=1'
+
     ini_page_url = page_url
 
     if not page_url.startswith("http"): page_url = web_yt + '/watch?v=%s' % page_url
 
     page_url = servertools.normalize_url('youtube', page_url)
 
-    data = httptools.downloadpage(page_url).data
+    data = httptools.downloadpage(page_url, headers = headers).data
 
     if "File was deleted" in data or 'El vídeo no está disponible' in data:
-        return 'El archivo no existe o ha sido borrado'
+        return 'Archivo inexistente ó eliminado'
 
     video_id = scrapertools.find_single_match(page_url, '(?:v=|embed/)([A-z0-9_-]{11})')
 

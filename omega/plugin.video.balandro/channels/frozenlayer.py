@@ -7,8 +7,13 @@ from core.item import Item
 from core import httptools, scrapertools, servertools, tmdb
 
 
-host = 'https://www.frozen-layer.com'
+host = 'https://www.frozen-layer.com/'
 
+
+def do_downloadpage(url, post=None, headers=None):
+    data = httptools.downloadpage(url, post=post, headers=headers).data
+
+    return data
 
 def mainlist(item):
     return mainlist_series(item)
@@ -18,27 +23,29 @@ def mainlist_series(item):
     logger.info()
     itemlist = []
 
-    descartar_anime = config.get_setting('descartar_anime', default=False)
+    if config.get_setting('descartar_anime', default=False): return
 
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar anime, ova, dorama, manga ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
     itemlist.append(item.clone( title = 'Catálogo general', action = 'list_all', url = host + '/descargas/detallada/bittorrent', search_type = 'tvshow' ))
 
-    if not descartar_anime:
-        itemlist.append(item.clone( title = 'Animes:', folder=False, text_color='moccasin' ))
+    itemlist.append(item.clone( title = 'Doramas:', folder=False, text_color='firebrick' ))
+    itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/dorama', search_type = 'tvshow' ))
+
+    if not config.get_setting('descartar_anime', default=False):
+        itemlist.append(item.clone( title = 'Animes:', folder=False, text_color='springgreen' ))
 
         itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/tv?&categoria=tv&detallada=true', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - Estrenos', action = 'list_lst', url = host + '/animes/lista?sort=anio&direction=desc&detallada=true', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - [COLOR cyan]Estrenos[/COLOR]', action = 'list_lst', url = host + '/animes/lista?sort=anio&direction=desc&detallada=true', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - Más valorados', action = 'list_lst', url = host + '/animes/lista?sort=rating&direction=desc&detallada=true', search_type = 'tvshow' ))
 
-        itemlist.append(item.clone( title = ' - [COLOR deepskyblue]Películas [/COLOR]', action = 'list_lst', url = host + '/buscar/anime/pelicula?&categoria=pelicula&detallada=true', search_type = 'tvshow' ))
+        itemlist.append(item.clone( title = ' - [COLOR deepskyblue]Películas[/COLOR]', action = 'list_lst', url = host + '/buscar/anime/pelicula?&categoria=pelicula&detallada=true', search_type = 'tvshow' ))
 
         itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime', search_type = 'tvshow' ))
 
@@ -50,11 +57,7 @@ def mainlist_series(item):
         itemlist.append(item.clone( title = ' - Catálogo', action = 'list_lst', url = host + '/buscar/anime/ova?&categoria=ova&detallada=true', search_type = 'tvshow' ))
         itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/anime-OVA', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Doramas:', folder=False, text_color='moccasin' ))
-    itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/dorama', search_type = 'tvshow' ))
-
-    if not descartar_anime:
-        itemlist.append(item.clone( title = 'Mangas:', folder=False, text_color='moccasin' ))
+        itemlist.append(item.clone( title = 'Mangas:', folder=False, text_color='orange' ))
         itemlist.append(item.clone( title = ' - Episodios', action = 'list_all', url = host + '/descargas/detallada/bittorrent/manga', search_type = 'tvshow' ))
 
     return itemlist
@@ -64,9 +67,7 @@ def categorias(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
-
-    data = httptools.downloadpage(host + '/animes').data
+    data = do_downloadpage(host + '/animes')
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     bloque = scrapertools.find_single_match(data, '<h2>Categorias(.*?)</div>')
@@ -74,7 +75,7 @@ def categorias(item):
     matches = re.compile('<a href="(.*?)".*?">(.*?)</a>').findall(bloque)
 
     for url, title in matches:
-        if descartar_xxx:
+        if config.get_setting('descartar_xxx', default=False):
             if title == 'Adulto': continue
             elif title == 'Erótico': continue
             elif title == 'Incesto': continue
@@ -102,7 +103,7 @@ def list_all(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, "<h1 class='descarga_titulo'>(.*?)</div></div>")
@@ -168,7 +169,7 @@ def list_lst(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, "id='descarga_anime_row'>(.*?)</span></div>")
@@ -218,7 +219,7 @@ def episodios(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
     data = re.sub(r'\n|\r|\t|\s{2}|&nbsp;', '', data)
 
     matches = scrapertools.find_multiple_matches(data, "<td class='tit'>(.*?)<td class='detalles'>")
@@ -256,7 +257,7 @@ def findvideos(item):
     logger.info()
     itemlist = []
 
-    data = httptools.downloadpage(item.url).data
+    data = do_downloadpage(item.url)
 
     matches = scrapertools.find_multiple_matches(data, 'Seeds:.*?"stats.*?">(\d+)<.*?Peers:.*?"stats.*?">(\d+)<.*?descargar_torrent.*?href=\'(.*?)\'')
 

@@ -20,28 +20,28 @@ def mainlist_pelis(item):
     logger.info()
     itemlist = []
 
-    descartar_xxx = config.get_setting('descartar_xxx', default=False)
+    if config.get_setting('descartar_xxx', default=False): return
 
-    if descartar_xxx: return itemlist
     if config.get_setting('adults_password'):
         from modules import actions
-        if actions.adults_password(item) == False:
-            return itemlist
+        if actions.adults_password(item) == False: return
 
     itemlist.append(item.clone( title = 'Buscar vídeo ...', action = 'search', search_type = 'movie', text_color='orange' ))
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'hentai/' ))
 
-    itemlist.append(item.clone( title = 'Estrenos', action = 'list_list', url = host + 'hentai/estrenos/' ))
+    itemlist.append(item.clone( title = 'Estrenos', action = 'list_list', url = host + 'hentai/estrenos/', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Sin censura', action = 'list_all', url = host + 'hentai/sin-censura/' ))
 
-    itemlist.append(item.clone( title = 'Por género', action = 'generos' ))
+    itemlist.append(item.clone( title = 'Latino', action = 'list_list', url = host + 'hentai/generos/latino/' ))
+
+    itemlist.append(item.clone( title = 'Por categoría', action = 'categorias' ))
 
     return itemlist
 
 
-def generos(item):
+def categorias(item):
     logger.info()
     itemlist = []
 
@@ -51,6 +51,8 @@ def generos(item):
     matches = re.compile('<h3 class="media-heading"><a href="([^"]+)" alt="([^"]+)"', re.DOTALL).findall(data)
 
     for url, title in matches:
+        if title == 'audio latino': continue
+
         itemlist.append(item.clone( action = 'list_list', url = url, title = title, text_color='orange' ))
 
     return sorted(itemlist, key=lambda i: i.title)
@@ -150,7 +152,7 @@ def findvideos(item):
             servidor = servertools.corregir_servidor(servidor)
 
             if not servidor == 'directo':
-                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'VO' ))
+                itemlist.append(Item( channel = item.channel, action = 'play', server = servidor, url = url, language = 'Vo' ))
 
     return itemlist
 

@@ -7,18 +7,12 @@ import sys
 PY3 = False
 if sys.version_info[0] >= 3: PY3 = True; unicode = str; unichr = chr; long = int; _dict = dict
 
-import re
-import traceback
-if not PY3: _dict = dict; from collections import OrderedDict as dict
+from lib import AlfaChannelHelper
+if not PY3: _dict = dict; from AlfaChannelHelper import dict
+from AlfaChannelHelper import DictionaryAdultChannel
+from AlfaChannelHelper import re, traceback, time, base64, xbmcgui
+from AlfaChannelHelper import Item, servertools, scrapertools, jsontools, get_thumb, config, logger, filtertools, autoplay
 
-from core.item import Item
-from core import servertools
-from core import scrapertools
-from core import jsontools
-from channelselector import get_thumb
-from platformcode import config, logger
-from channels import filtertools, autoplay
-from lib.AlfaChannelHelper import DictionaryAdultChannel
 
 IDIOMAS = {}
 list_language = list(set(IDIOMAS.values()))
@@ -30,6 +24,7 @@ forced_proxy_opt = 'ProxySSL'
 
 # https://d1ck.co/   https://faphard.co/   https://f1ix.com/ https://pornrz.com/  https://pornn.co/
 # https://18yos.co/   https://boombj.com/  https://roleplayers.co/   https://teenanal.co/  https://wanktank.co/
+# https://amateurporntape.com/  https://amateurporngirlfriends.com/
 
 canonical = {
              'channel': 'd1ck', 
@@ -49,32 +44,30 @@ tv_path = ''
 language = []
 url_replace = []
 
-finds = {'find': {'find_all': [{'tag': ['div'], 'class': ['preview']}]},
-         'categories': {'find_all': [{'tag': ['div'], 'class': ['preview']}]},
+finds = {'find': {'find_all': [{'tag': ['div'], 'class': ['item', 'preview']}]},
+         'categories': {'find_all': [{'tag': ['div'], 'class': ['item','preview']}]},
          'search': {}, 
          'get_quality': {}, 
          'get_quality_rgx': '', 
-         'next_page': dict([('find', [{'tag': ['ul'], 'class': ['pages']}]),
-                            ('find_all', [{'tag': ['a'], '@POS': [-1], '@ARG': 'href'}])]), 
-         # 'next_page': dict([('find', [{'tag': ['ul'], 'class': ['pages']}]),
-                            # ('find_all', [{'tag': ['a'], '@POS': [-1], '@ARG': 'data-parameters', '@TEXT': ':(\d+)'}])]), 
+         'next_page': {},
          'next_page_rgx': [['&from_videos=\d+', '&from_videos=%s'], ['&from=\d+', '&from=%s'], 
                            ['/\d+', '/%s/'], ['&page=\d+', '&page=%s'], ['\?page=\d+', '?page=%s'], ['\/page\/\d+\/', '/page/%s/']], 
-         'last_page': {},
+         'last_page':dict([('find', [{'tag': ['div'], 'class': ['pagination']}]),
+                           ('find_all', [{'tag': ['a'], '@POS': [-2], '@ARG': 'data-parameters', '@TEXT': ':(\d+)'}])]), 
          'plot': {}, 
-         'findvideos': dict([('find', [{'tag': ['li'], 'class': 'link-tabs-container', '@ARG': 'href'}]),
-                             ('find_all', [{'tag': ['a'], '@ARG': 'href'}])]),
+         'findvideos': {},
          'title_clean': [['[\(|\[]\s*[\)|\]]', ''],['(?i)\s*videos*\s*', '']],
          'quality_clean': [['(?i)proper|unrated|directors|cut|repack|internal|real|extended|masted|docu|super|duper|amzn|uncensored|hulu', '']],
          'url_replace': [], 
-         'profile_labels': {'list_all_stime': dict([('find', [{'tag': ['div'], 'class': ['dur']}]),
+         'profile_labels': {
+                            'list_all_stime': dict([('find', [{'tag': ['div'], 'class': ['time']}]),
                                                     ('get_text', [{'strip': True}])]),
                             # 'list_all_quality': dict([('find', [{'tag': ['span'], 'class': ['hd']}]),
                                                       # ('get_text', [{'strip': True}])]),
-                            'section_cantidad': dict([('find', [{'tag': ['div'], 'class': ['dur']}]),
+                            'section_cantidad': dict([('find', [{'tag': ['div'], 'class': ['thumb-item']}]),
                                                       ('get_text', [{'strip': True}])])
                            },
-         'controls': {'url_base64': False, 'cnt_tot': 40, 'reverse': False, 'profile': 'default'},  ##'jump_page': True, ##Con last_page  aparecerá una línea por encima de la de control de página, permitiéndote saltar a la página que quieras
+         'controls': {'url_base64': False, 'cnt_tot': 20, 'reverse': False, 'profile': 'default'},  ##'jump_page': True, ##Con last_page  aparecerá una línea por encima de la de control de página, permitiéndote saltar a la página que quieras
          'timeout': timeout}
 AlfaChannel = DictionaryAdultChannel(host, movie_path=movie_path, tv_path=tv_path, movie_action='play', canonical=canonical, finds=finds, 
                                      idiomas=IDIOMAS, language=language, list_language=list_language, list_servers=list_servers, 
@@ -86,21 +79,24 @@ AlfaChannel = DictionaryAdultChannel(host, movie_path=movie_path, tv_path=tv_pat
 def mainlist(item):
     logger.info()
     itemlist = []
-    
     itemlist.append(Item(channel=item.channel, title="18yos" , action="submenu", url="https://18yos.co/", chanel="18yos", thumbnail="https://i.postimg.cc/13RpPMBr/18yos.png"))
+    itemlist.append(Item(channel=item.channel, title="amateurporngirlfriends" , action="submenu", url="https://amateurporngirlfriends.com/", chanel="amateurporngirlfriends", thumbnail="https://i.postimg.cc/kG3RCpcH/amateurporngirlfriends.png"))
+    itemlist.append(Item(channel=item.channel, title="amateurporntape" , action="submenu", url="https://amateurporntape.com/", chanel="amateurporntape", thumbnail="https://i.postimg.cc/rsNskFzd/amateurporntape.png"))
     itemlist.append(Item(channel=item.channel, title="Boombj" , action="submenu", url="https://boombj.com/", chanel="boombj", thumbnail="https://i.postimg.cc/NMxsg8pR/boombj.png"))
+    itemlist.append(Item(channel=item.channel, title="Cuteasian" , action="submenu", url="https://cuteasians.co/", chanel="cuteasian", thumbnail="https://i.postimg.cc/zXNzfb89/cuteasians.png"))
     itemlist.append(Item(channel=item.channel, title="D1ck" , action="submenu", url="https://d1ck.co/", chanel="d1ck", thumbnail="https://i.postimg.cc/59DzCVYv/d1ck.png"))
+    itemlist.append(Item(channel=item.channel, title="FH" , action="submenu", url="https://fapharder.com/", chanel="FH", thumbnail="https://i.postimg.cc/fbpqRdnX/fapharder.png"))
     itemlist.append(Item(channel=item.channel, title="Faphard" , action="submenu", url="https://faphard.co/", chanel="faphard", thumbnail="https://i.postimg.cc/13jTxgSM/Faphard.png"))
     itemlist.append(Item(channel=item.channel, title="F1ix" , action="submenu", url="https://f1ix.com/", chanel="f1ix", thumbnail="https://i.postimg.cc/dtrsWYKh/f1ix.png"))
-    itemlist.append(Item(channel=item.channel, title="Pornrz" , action="submenu", url="https://pornrz.com/", chanel="pornrz", thumbnail="https://i.postimg.cc/LX19cG4m/pornrz.png"))
     itemlist.append(Item(channel=item.channel, title="Pornn" , action="submenu", url="https://pornn.com/", chanel="pornn", thumbnail="https://i.postimg.cc/9FRRCKH2/pornn.png"))
+    itemlist.append(Item(channel=item.channel, title="Pornrz" , action="submenu", url="https://pornrz.com/", chanel="pornrz", thumbnail="https://i.postimg.cc/LX19cG4m/pornrz.png"))
+    itemlist.append(Item(channel=item.channel, title="Pornry" , action="submenu", url="https://pornry.com/", chanel="pornry", thumbnail="https://i.postimg.cc/cLrQL47G/pornry.png"))
     itemlist.append(Item(channel=item.channel, title="RolePlayers" , action="submenu", url="https://roleplayers.co/", chanel="roleplayers", thumbnail="https://i.postimg.cc/t4GM50XC/roleplayers.png"))
     itemlist.append(Item(channel=item.channel, title="TeenAnal" , action="submenu", url="https://teenanal.co/", chanel="teenanal", thumbnail="https://i.postimg.cc/pLZM5VDt/teenanal.png"))
+    itemlist.append(Item(channel=item.channel, title="TwistedNuts" , action="submenu", url="https://twistednuts.com/", chanel="twistednuts", thumbnail="https://i.postimg.cc/KcHwY4Bm/twistednuts.png"))
+    itemlist.append(Item(channel=item.channel, title="Udvl" , action="submenu", url="https://udvl.com/", chanel="udvl", thumbnail="https://i.postimg.cc/h4HKfq00/udvl.png"))
     itemlist.append(Item(channel=item.channel, title="WankTank" , action="submenu", url="https://wanktank.co/", chanel="wanktank", thumbnail="https://i.postimg.cc/GtQxJfz9/wanktank.png"))
 
-    AlfaChannel.host = item.url
-    AlfaChannel.canonical = canonical.update({'channel': item.chanel, 'host': config.get_setting("current_host", item.chanel, default=''), 'host_alt': AlfaChannel.host})    
-    
     return itemlist
 
 
@@ -108,12 +104,15 @@ def submenu(item):
     logger.info()
     itemlist = []
     config.set_setting("current_host", item.url, item.chanel)
-    # itemlist.append(Item(channel=item.channel, title="Nuevas" , action="list_all", url=host + "latest-updates/?sort_by=post_date&from=01"))
-    itemlist.append(Item(channel=item.channel, title="Nuevas" , action="list_all", url=item.url + "latest-updates/1/"))
-    itemlist.append(Item(channel=item.channel, title="Mas Vistas" , action="list_all", url=item.url + "most-popular/1/"))
-    itemlist.append(Item(channel=item.channel, title="Mejor valorada" , action="list_all", url=item.url + "top-rated/1/"))
-    itemlist.append(Item(channel=item.channel, title="Categorias" , action="section", url=item.url + "categories/", extra="Categorias"))
-    itemlist.append(Item(channel=item.channel, title="Buscar", action="search", url=item.url))
+    AlfaChannel.host = item.url
+    AlfaChannel.canonical.update({'channel': item.chanel, 'host': AlfaChannel.host, 'host_alt': [AlfaChannel.host]})
+    
+    # itemlist.append(Item(channel=item.channel, title="Nuevas" , action="list_all", url=host + "latest-updates/?sort_by=post_date&from=01", chanel=item.chanel))
+    itemlist.append(Item(channel=item.channel, title="Nuevas" , action="list_all", url=item.url + "latest-updates/1/", chanel=item.chanel))
+    itemlist.append(Item(channel=item.channel, title="Mas Vistas" , action="list_all", url=item.url + "most-popular/1/", chanel=item.chanel))
+    itemlist.append(Item(channel=item.channel, title="Mejor valorada" , action="list_all", url=item.url + "top-rated/1/", chanel=item.chanel))
+    itemlist.append(Item(channel=item.channel, title="Categorias" , action="section", url=item.url + "categories/", extra="Categorias", chanel=item.chanel))
+    itemlist.append(Item(channel=item.channel, title="Buscar", action="search", url=item.url, chanel=item.chanel))
     
     return itemlist
 
@@ -122,9 +121,10 @@ def section(item):
     logger.info()
 
     findS = finds.copy()
+    findS['url_replace'] = [['(\/(?:categories|channels|models|pornstars)\/[^$]+$)', r'\1?sort_by=post_date&from=1']]
 
-    if item.extra == "Categorias":
-        findS['url_replace'] = [[host, '%scategories/' % host], ['($)', '1/']]
+    # if item.extra == "Categorias":
+        # findS['url_replace'] = [[host, '%scategories/' % host], ['($)', '1/']]
 
     return AlfaChannel.section(item, finds=findS, **kwargs)
 
@@ -152,9 +152,14 @@ def play(item):
     logger.info()
     itemlist = []
     
-    soup = AlfaChannel.create_soup(item.url, **kwargs)
-    url = soup.find('div', class_='player-holder').iframe['src']
+    AlfaChannel.host = config.get_setting("current_host", item.chanel, default=host)
+    AlfaChannel.canonical.update({'channel': item.chanel, 'host': AlfaChannel.host, 'host_alt': [AlfaChannel.host]})
     
+    if "udvl" in item.url:
+        url = item.url
+    else:
+        soup = AlfaChannel.create_soup(item.url, **kwargs)
+        url = soup.find('div', class_='player-holder').iframe['src']
     itemlist.append(Item(channel=item.channel, action="play", title= "%s", contentTitle = item.contentTitle, url=url))
     itemlist = servertools.get_servers_itemlist(itemlist, lambda i: i.title % i.server.capitalize())
     return itemlist

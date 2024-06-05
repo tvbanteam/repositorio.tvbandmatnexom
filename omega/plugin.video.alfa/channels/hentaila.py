@@ -15,14 +15,14 @@ from core import httptools, scrapertools, servertools, tmdb, jsontools
 from core.item import Item
 from platformcode import config, logger, platformtools
 from channelselector import get_thumb
-from channels import autoplay
+from modules import autoplay
 from lib import strptime_fix
 
 canonical = {
              'channel': 'hentaila', 
              'host': config.get_setting("current_host", 'hentaila', default=''), 
-             'host_alt': ["https://www3.hentaila.com"], 
-             'host_black_list': [], 
+             'host_alt': ["https://www4.hentaila.com"], 
+             'host_black_list': ["https://www3.hentaila.com"], 
              'set_tls': True, 'set_tls_min': True, 'retries_cloudflare': 1, 'cf_assistant': False, 
              'CF': False, 'CF_test': False, 'alfa_s': True
             }
@@ -264,7 +264,7 @@ def filter_by_selection(item, clearUrl=False):
     itemlist = []
     data = httptools.downloadpage(host + "/directorio", canonical=canonical).data
     if item.param == 'genre':
-        pattern = '(?s)a href="([^"]+)" class="">([^<]+)'
+        pattern = '(?s)a href="([^"]+)" class>([^<]+)'
         matches = scrapertools.find_multiple_matches(data, pattern)
     elif item.param == 'alphabet':
         sectptn = '(?s)class="alpha-list".+?/section>'
@@ -568,11 +568,11 @@ def episodesxseason(item, get_episodes = False):
     for article in epmatch:
         scpepnum = str(article.find('h2', class_='h-title').string)
         scpepnum = int(scrapertools.find_single_match(scpepnum, '(\d+)$'))
-        scpdate = str(article.find('header', class_='h-header').find('time').string)
-        date = datetime.datetime.strptime(scpdate, "%B %d, %Y")
-        infoLabels['first_air_date'] = date.strftime("%Y/%m/%d")
-        infoLabels['premiered'] = infoLabels['first_air_date']
-        infoLabels['year'] = date.strftime("%Y")
+        # scpdate = str(article.find('header', class_='h-header').find('time').string)
+        # date = datetime.datetime.strptime(scpdate, "%B %d, %Y")
+        # infoLabels['first_air_date'] = date.strftime("%Y/%m/%d")
+        # infoLabels['premiered'] = infoLabels['first_air_date']
+        # infoLabels['year'] = date.strftime("%Y")
         infoLabels['episode'] = scpepnum
         title = scrapertools.get_season_and_episode(str(item.infoLabels['season']) + 'x' + str(item.infoLabels['episode'])) + ': ' + item.contentSerieName
 

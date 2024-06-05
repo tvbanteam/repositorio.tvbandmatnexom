@@ -7,12 +7,15 @@ from core.item import Item
 from core import httptools, scrapertools, tmdb
 
 
-host = 'https://www4.mejortorrent.rip'
+host = 'https://www14.mejortorrent.rip'
 
 
 # ~ por si viene de enlaces guardados
 ant_hosts = ['https://mejortorrent.app', 'https://mejortorrent.wtf', 'https://www1.mejortorrent.rip',
-             'https://www2.mejortorrent.rip', 'https://www3.mejortorrent.rip']
+             'https://www2.mejortorrent.rip', 'https://www3.mejortorrent.rip', 'https://www4.mejortorrent.rip',
+             'https://www5.mejortorrent.rip', 'https://www6.mejortorrent.rip', 'https://www7.mejortorrent.rip',
+             'https://www8.mejortorrent.rip', 'https://www9.mejortorrent.rip', 'https://www10.mejortorrent.rip',
+             'https://www11.mejortorrent.rip', 'https://www12.mejortorrent.rip', 'https://www13.mejortorrent.rip']
 
 
 domain = config.get_setting('dominio', 'mejortorrentapp', default='')
@@ -63,10 +66,27 @@ def do_downloadpage(url, post=None, headers=None):
     for ant in ant_hosts:
         url = url.replace(ant, host)
 
+    hay_proxies = False
+    if config.get_setting('channel_mejortorrentapp_proxies', default=''): hay_proxies = True
+
     if not url.startswith(host):
         data = httptools.downloadpage(url, post=post, headers=headers).data
     else:
-        data = httptools.downloadpage_proxy('mejortorrentapp', url, post=post, headers=headers).data
+        if hay_proxies:
+            data = httptools.downloadpage_proxy('mejortorrentapp', url, post=post, headers=headers).data
+        else:
+            data = httptools.downloadpage(url, post=post, headers=headers).data
+
+        if not data:
+            if not '/busqueda?q=' in url:
+                if config.get_setting('channels_re_charges', default=True): platformtools.dialog_notification('MejorTorrentApp', '[COLOR cyan]Re-Intentanto acceso[/COLOR]')
+
+                timeout = config.get_setting('channels_repeat', default=30)
+
+                if hay_proxies:
+                    data = httptools.downloadpage_proxy('mejortorrentapp', url, post=post, headers=headers, timeout=timeout).data
+                else:
+                    data = httptools.downloadpage(url, post=post, headers=headers, timeout=timeout).data
 
     return data
 
@@ -124,7 +144,7 @@ def mainlist_pelis(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/public/peliculas/', search_type = 'movie' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'movie' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'movie', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_list', url = host + '/busqueda/', search_type = 'movie' ))
 
@@ -145,9 +165,9 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Buscar serie ...', action = 'search', search_type = 'tvshow', text_color = 'hotpink' ))
 
-    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/series/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/public/series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'tvshow' ))
+    itemlist.append(item.clone( title = 'Últimas', action = 'list_list', url = host + '/public/torrents/', search_type = 'tvshow', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Más vistas', action = 'list_list', url = host + '/busqueda/', search_type = 'tvshow' ))
 
@@ -168,7 +188,7 @@ def mainlist_documentales(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + '/documentales/', search_type = 'documentary' ))
 
-    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/public/torrents/', search_type = 'documentary' ))
+    itemlist.append(item.clone( title = 'Últimos', action = 'list_list', url = host + '/public/torrents/', search_type = 'documentary', text_color='cyan' ))
 
     itemlist.append(item.clone( title = 'Más vistos', action = 'list_list', url = host + '/busqueda/', search_type = 'documentary' ))
 
@@ -291,7 +311,7 @@ def list_all(item):
 
         url = host + url
 
-        title = title.replace('-', ' ')
+        title = title.replace('-', ' ').strip()
 
         if item.search_type == 'movie':
             titulo = title
@@ -302,16 +322,13 @@ def list_all(item):
             itemlist.append(item.clone( action='findvideos', url=url, title=title, thumbnail=thumb, qualities=qlty,
                                         contentType='movie', contentTitle=titulo, infoLabels={'year': '-'} ))
 
-            continue
-
-        if item.search_type == 'tvshow':
+        elif item.search_type == 'tvshow':
             if " Temporada" in title: SerieName = title.split(" Temporada")[0]
             else: SerieName = title
 
-            itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, qualities=qlty,
-                                        contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
-
-            continue
+            if SerieName:
+                itemlist.append(item.clone( action='episodios', url=url, title=title, thumbnail=thumb, qualities=qlty,
+                                            contentType='tvshow', contentSerieName=SerieName, infoLabels={'year': '-'} ))
 
         else:
             if "(" in title: titulo = title.split("(")[0]
@@ -409,7 +426,7 @@ def list_list(item):
             itemlist.append(item.clone( action = 'findvideos', url = url, title = title, qualities = qlty, fmt_sufijo = sufijo,
                                         contentType = 'movie', contentTitle = titulo, infoLabels = {'year': year} ))
 
-        if item.search_type == 'tvshow':
+        elif item.search_type == 'tvshow':
             if not item.search_type == "all":
                 if item.search_type == "movie": continue
 
@@ -425,7 +442,7 @@ def list_list(item):
             itemlist.append(item.clone( action='episodios', url = url, title = title, fmt_sufijo = sufijo,
                                         contentType = 'tvshow', contentSerieName = SerieName, infoLabels = {'year': year} ))
 
-        if item.search_type == 'documentary':
+        else:
             if not item.search_type == "all":
                 if item.search_type == "tvshow": continue
 
@@ -538,7 +555,7 @@ def findvideos(item):
 
         url = scrapertools.find_single_match(data, '>Torrent:<.*?<a href="(.*?)"')
 
-        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang ))
+        itemlist.append(Item( channel = item.channel, action = 'play', title = '', url = url, server = 'torrent', language = lang, quality = item.qualities ))
 
         return itemlist
 

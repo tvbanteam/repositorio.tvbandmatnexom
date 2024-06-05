@@ -20,6 +20,7 @@ from platformcode import platformtools
 
 from core import httptools
 import re
+import json
 
 MODULE_NAME = "setting"
 
@@ -35,14 +36,6 @@ def mainlist(item):
                          thumbnail=get_thumb("channels.png")))
     itemlist.append(Item(module=MODULE_NAME, title=config.get_localized_string(60538), action="menu_servers", folder=True,
                          thumbnail=get_thumb("on_the_air.png")))
-    itemlist.append(Item(module="search", title=config.get_localized_string(60540), action="opciones", folder=True,
-                         thumbnail=get_thumb("search.png")))
-    itemlist.append(Item(module=MODULE_NAME, title=config.get_localized_string(60541), action="channel_config",
-                         config="downloads", folder=True, thumbnail=get_thumb("downloads.png")))
-
-    if config.get_videolibrary_support():
-        itemlist.append(Item(module="videolibrary", title=config.get_localized_string(60542), action="channel_config",
-                             folder=True, thumbnail=get_thumb("videolibrary.png")))
 
     if config.is_xbmc():
         itemlist.append(Item(module=MODULE_NAME, title=config.get_localized_string(70253), action="setting_torrent",
@@ -907,8 +900,11 @@ def icon_set_selector(item=None):
     platformtools.dialog_notification("Alfa", "Obteniendo iconos, por favor espere...")
     options = list()
     data = httptools.downloadpage("https://github.com/alfa-addon/media/tree/master/themes").data
-    patron = '<a class="js-navigation-open Link--primary" title="([^"]+)"'
-    matches = re.compile(patron, re.DOTALL).findall(data)
+    patron = '<script type="application/json" '
+    patron += 'data-target="react-app\.embeddedData">(.+?)</script>'
+    data = re.compile(patron, re.DOTALL).findall(data)[0]
+    data = json.loads(data)
+    matches = [x['name'] for x in data['payload']['tree']['items']]
 
     default = Item(
             plot = 'El tema por defecto de Alfa',
@@ -919,8 +915,8 @@ def icon_set_selector(item=None):
 
     for set_id in matches:
         logger.info(set_id)
-        path_demo = "https://github.com/alfa-addon/media/raw/master/themes/%s/thumb_channels_movie.png" % set_id
-        path_info = "https://github.com/alfa-addon/media/raw/master/themes/%s/README.md" % set_id
+        path_demo = "https://raw.githubusercontent.com/alfa-addon/media/master/themes/%s/thumb_channels_movie.png" % set_id
+        path_info = "https://raw.githubusercontent.com/alfa-addon/media/master/themes/%s/README.md" % set_id
         opt = Item(
                 plot = httptools.downloadpage(path_info).data,
                 title = set_id.title(),

@@ -46,7 +46,7 @@ def mainlist_series(item):
 
     itemlist.append(item.clone( title = 'Catálogo', action = 'list_all', url = host + 'lista-series/', search_type = 'tvshow' ))
 
-    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/', search_type = 'tvshow', text_color = 'olive' ))
+    itemlist.append(item.clone( title = 'Últimos episodios', action = 'list_epis', url = host + 'lista-series/episodios-agregados-actualizados/', search_type = 'tvshow', text_color = 'cyan' ))
 
     itemlist.append(item.clone( title = 'Animación', action ='list_all', url = host + 'category/animacion/', search_type = 'tvshow', text_color='moccasin' ))
 
@@ -68,7 +68,7 @@ def generos(item):
     else: text_color = 'hotpink'
 
     data = httptools.downloadpage(host).data
-   
+
     patron = 'class="menu-item menu-item-type-taxonomy menu-item-object-category.*?<a href="(.*?)">(.*?)</a>'
 
     matches = re.compile(patron, re.DOTALL).findall(data)
@@ -262,7 +262,9 @@ def temporadas(item):
         title = 'Temporada ' + tempo
 
         if len(matches) == 1:
-            platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+            if config.get_setting('channels_seasons', default=True):
+                platformtools.dialog_notification(item.contentSerieName.replace('&#038;', '&').replace('&#8217;', "'"), 'solo [COLOR tan]' + title + '[/COLOR]')
+
             item.page = 0
             item.contentType = 'season'
             item.contentSeason = tempo
@@ -299,7 +301,8 @@ def episodios(item):
             if not tvdb_id: tvdb_id = scrapertools.find_single_match(str(item), "'tmdb_id': '(.*?)'")
         except: tvdb_id = ''
 
-        if tvdb_id:
+        if config.get_setting('channels_charges', default=True): item.perpage = sum_parts
+        elif tvdb_id:
             if sum_parts > 50:
                 platformtools.dialog_notification('RetroTv', '[COLOR cyan]Cargando Todos los elementos[/COLOR]')
                 item.perpage = sum_parts
@@ -372,27 +375,32 @@ def findvideos(item):
 
     ses = 0
 
-    for opt, servidor, lang_qlty in matches:
+    for opt, srv, lang_qlty in matches:
         ses += 1
 
-        servidor = servidor.replace('<strong>', '').replace('</strong>', '')
-        servidor = servertools.corregir_servidor(servidor)
+        srv = srv.replace('<strong>', '').replace('</strong>', '')
+        srv = servertools.corregir_servidor(srv)
 
         url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src="(.*?)"')
-        if not url: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
 
-        if url.startswith('//') == True: url = scrapertools.find_single_match(data, ' id="Opt' + str(opt) + '".*?src=&quot;(.*?)&quot;')
+        if not url or url == 'https://':
+            url = scrapertools.find_single_match(str(data).replace('src=&quot;', 'src="').replace('&quot;', '"'), ' id="Opt' + str(opt) + '".*?src="(.*?)"')
 
-        if not servidor or not url: continue
+        if url.startswith('//') == True: 
+            url = scrapertools.find_single_match(str(data).replace('src=&quot;', 'src="').replace('&quot;', '"'), ' id="Opt' + str(opt) + '"".*?src="(.*?)"')
 
-        if 'opción' in servidor or 'servidor' in servidor:
-            link_other = servidor
+        if not srv or not url: continue
+
+        servidor = srv
+
+        if 'opción' in srv or 'servidor' in srv:
+            link_other = srv
             servidor = 'directo'
-        elif servidor == 'anavids':
-            link_other = servidor
+        elif srv == 'anavids':
+            link_other = srv
             servidor = 'directo'
-        elif servidor == 'blenditall':
-            link_other = servidor
+        elif srv == 'blenditall':
+            link_other = srv
             servidor = 'directo'
 
         else: link_other = ''
